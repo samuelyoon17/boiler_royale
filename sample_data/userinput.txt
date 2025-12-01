@@ -1,0 +1,2 @@
+get_user_tournament_info
+("2", "ABC123XYZ")

@@ -1,0 +1,74 @@
+add_user
+("ABC123XYZ", "RoyalSam", "samuelyoon", "hashedpassword123", None, "Samuel", "Yoon", 1450, 3)
+add_user
+("XYZ987ABC", "IceWizard", "michaelk", "hashpass234", "michael.k@example.com", "Michael", "Kim", 1280, 2)
+add_user
+("JKL456MNO", "FireStorm", "ellajung", "securehash888", None, "Ella", "Jung", 1510, 4)
+add_user
+("TUV222PQR", "KnightRider", "danielh", "stronghash001", "daniel.h@example.com", "Daniel", "Hwang", 1375, 2)
+add_user
+("QWE789RTY", "LightningLeo", "leewon", "hashleo998", None, "Won", "Lee", 1620, 5)
+add_user
+("GHI654JKL", "MegaMinion", "jpark", "pass999xyz", "j.park@example.com", "Jin", "Park", 1200, 1)
+add_user
+("DEF333GHI", "PekkaPunch", "sofiacho", "hashsofia555", None, "Sofia", "Cho", 1300, 2)
+add_user
+("LMN888OPQ", "RocketRon", "ronnyc", "ronhash321", "ronny.c@example.com", "Ronny", "Choi", 1180, 1)
+add_user
+("UVW555XYZ", "GoblinKing", "jaylee", "jayhash789", None, "Jay", "Lee", 1700, 6)
+add_user
+("RTY111UIO", "BarbKing", "chrisp", "chrissecure", "chris.p@example.com", "Chris", "Park", 1400, 3)
+add_user
+("BNM444ASD", "ZapMaster", "aideny", "aidenhash333", None, "Aiden", "Yang", 1330, 2)
+add_user
+("POI222LKJ", "SkeletonLord", "heejin", "heejinpass123", "heejin.k@example.com", "Heejin", "Kwon", 1250, 1)
+add_user
+("ZXC777VBN", "CannonCarl", "minsoo", "minsoohash098", None, "Minsoo", "Han", 1570, 5)
+add_tournament
+("Autumn Clash", "2025-11-28", "2025-11-28")
+add_tournament
+("Winter Ladder", "2025-12-05", "2025-12-07")
+add_tournament
+("Spring Invitational", "2026-03-10", "2026-03-20")
+record_match
+(1, 4, "ABC123XYZ", "XYZ987ABC", "ABC123XYZ", '3-1', '2025-11-27 18:30:00')
+record_match
+(3, 2, "JKL456MNO", "TUV222PQR", "TUV222PQR", '3-0', '2025-11-27 19:15:00')
+record_match
+(1, 1, "QWE789RTY", "GHI654JKL", "QWE789RTY", '3-2', '2025-11-28 10:00:00')
+record_match
+(1, 1, "DEF333GHI", "LMN888OPQ", "DEF333GHI", '2-1', '2025-11-28 10:30:00')
+record_match
+(1, 2, "QWE789RTY", "DEF333GHI", "QWE789RTY", '3-0', '2025-11-28 12:00:00')
+record_match
+(2, 1, "UVW555XYZ", "RTY111UIO", "UVW555XYZ", '3-1', '2025-11-28 14:00:00')
+record_match
+(2, 1, "BNM444ASD", "POI222LKJ", "BNM444ASD", '2-1', '2025-11-28 14:30:00')
+record_match
+(3, 3, "ZXC777VBN", "ABC123XYZ", "ZXC777VBN", '3-0', '2025-11-28 16:00:00')
+record_match
+(3, 4, "XYZ987ABC", "JKL456MNO", "XYZ987ABC", '3-2', '2025-11-28 17:00:00')
+record_match
+(2, 2, "UVW555XYZ", "BNM444ASD", "UVW555XYZ", '2-0', '2025-11-28 18:00:00')
+
+
+record_match
+(1, 5, "RTY111UIO", "POI222LKJ", "RTY111UIO", '3-1', '2025-11-28 20:00:00')
+record_match
+(2, 3, "DEF333GHI", "BNM444ASD", "DEF333GHI", '2-1', '2025-12-05 10:00:00')
+record_match
+(2, 3, "UVW555XYZ", "QWE789RTY", "UVW555XYZ", '3-2', '2025-12-05 11:00:00')
+record_match
+(2, 3, "LMN888OPQ", "XYZ987ABC", "LMN888OPQ", '3-1', '2025-12-05 12:00:00')
+record_match
+(3, 5, "ZXC777VBN", "JKL456MNO", "ZXC777VBN", '3-1', '2026-03-10 14:00:00')
+record_match
+(3, 5, "ABC123XYZ", "TUV222PQR", "TUV222PQR", '3-2', '2026-03-10 15:00:00')
+record_match
+(3, 5, "GHI654JKL", "DEF333GHI", "GHI654JKL", '2-1', '2026-03-10 16:00:00')
+get_leaderboard
+("2",)
+get_leaderboard
+("10",)
+get_tournament_players
+("1",)
