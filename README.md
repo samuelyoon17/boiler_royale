@@ -64,7 +64,7 @@ To accelerate the development and validate architectural decisions, this project
 * Test Data Generation: Quickly generated simulated data for userinput.txt to robustly test sequential Elo updates and specific reporting queries.
 * Documentation & Presentation: Assisted in articulating technical decisions as shared in this README.
 
-All final code, architectural decisions, and data integrity checks were owned and verified by the developer.
+All final code, architectural decisions, and data integrity checks were verified by the developer.
 
 ## Usage
 1. Prerequisites
