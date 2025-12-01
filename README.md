@@ -40,8 +40,11 @@ This project evolved significantly during development as I optimized for scalabi
 * Solution: I implemented a LEFT JOIN combined with moving the filter condition (tournament_id) into the ON clause. This preserves the user row even if match data is null. I then utilized COALESCE to convert those nulls into readable "0-0" records for the frontend/application layer.
 
 3. Faster Search: Creating Indexes
-* Initial Approach: I did not create any indexes of frequently referenced columns. As the number of users increase, this would result in slow searches.
-* Solution: I created indexes on 
+* Initial Approach: I did not create any indexes of frequently referenced columns. As the number of users increase, this would result in slow searches. Examples include finding a user's current Elo, retrieving a player's match history, and linking battles to tournaments. Without indexing, the database would resort to slow, full-table scans.
+* Solution: I created indexes on the following columns to ensure O(logn) lookup performance:
+  * users.clash_royale_name and users.username: Fast login, user search, and administrative lookups.
+  * battles.player1_tag and battles.player2_tag: Fetching a player's complete match history.
+  * battles.tournament_id: Generating tournament-specific leaderboards and win/loss statistics.
 
 4. Multiple Connections: Handling Database Initialization
 * Challenge: PostgreSQL requires an active connection to an existing database (like the default postgres) to execute a CREATE DATABASE command. The main application client cannot assume the target database (boiler_royale_db) exists yet.
@@ -52,6 +55,18 @@ This project evolved significantly during development as I optimized for scalabi
 * Solution: I learned to use connection.autocommit = True specifically for Data Definition Language (DDL) operations. This overrides the adapter's default behavior, executing commands immediately.
 * Future Considerations Application: I am choosing to keep autocommit=True for the main application logic (PostgresClient). By offloading complex updates to Database Triggers, my Python script only needs to send single, atomic INSERT commands. The database engine ensures the integrity of the Match-to-Elo chain, removing the need for complex manual transaction management in the Application Layer. If my application requires more nuanced commands, I will turn off the autocommit.
 
+## Development Tools & AI Collaboration
+To accelerate the development and validate architectural decisions, this project utilized Gemini to help with the following:
+* Discovering Features: Learning about features of PostgreSQL and psycopg2 (e.g., CTEs, Triggers, COALESCE, connection.autocommit = True, User-defined Functions)
+* Code Optimization: Generating and refactoring SQL + PL/pgSQL statements for improved readability and conciseness (e.g., Elo calculation in PL/pgSQL).
+* Architectural Validation: Answering hypothetical scalability and concurrency questions.
+* Debugging: Identified architectural flaws that would lead to NULL returns for non-participants (e.g., using INNER JOIN for get_user_tournament_info.sql). AI imposed edge cases and suggested improved SQL syntax, resulting in the implementation of LEFT JOIN and robust conditional aggregation (COALESCE).
+* Test Data Generation: Quickly generated simulated data for userinput.txt to robustly test sequential Elo updates and specific reporting queries.
+* Documentation & Presentation: Assisted in articulating technical decisions as shared in this README.
+
+All final code, architectural decisions, and data integrity checks were owned and verified by the developer.
+
+## Usage
 1. Prerequisites
 
 ```
