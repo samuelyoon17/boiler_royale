@@ -14,7 +14,7 @@ A custom tournament management backend designed to facilitate competitive Clash 
 * Language: Python
 * Database: PostgreSQL
 * Libraries: psycopg2 (Database Adapter)
-* Concepts: ACID Transactions, Stored Procedures, Database Triggers, CTEs, RESTful Architecture principles.
+* Concepts: ACID Transactions, Stored Procedures, Database Triggers, CTEs.
 
 ## Database Schema
 
@@ -47,49 +47,63 @@ This project evolved significantly during development as I optimized for scalabi
 * Challenge: PostgreSQL requires an active connection to an existing database (like the default postgres) to execute a CREATE DATABASE command. The main application client cannot assume the target database (boiler_royale_db) exists yet.
 * Solution: I decoupled the logic into two specialized clients. The InitializationClient first connects to the default postgres system to create the database, then seamlessly reconnecting to the new boiler_royale_db to deploy the schema and triggers. This ensures robust deployment regardless of the initial environment state.
 
-## Setup & Usage
+5. Transaction Management & Library Behaviors
+* Initial Approach: While building the InitializationClient, my scripts kept failing during the CREATE DATABASE command. I discovered that the psycopg2 library adheres to Python DB-API standards by wrapping all commands in a transaction block. However, PostgreSQL architecture prevents creating databases inside a transaction block.
+* Solution: I learned to use connection.autocommit = True specifically for Data Definition Language (DDL) operations. This overrides the adapter's default behavior, executing commands immediately.
+* Future Considerations Application: I am choosing to keep autocommit=True for the main application logic (PostgresClient). By offloading complex updates to Database Triggers, my Python script only needs to send single, atomic INSERT commands. The database engine ensures the integrity of the Match-to-Elo chain, removing the need for complex manual transaction management in the Application Layer. If my application requires more nuanced commands, I will turn off the autocommit.
 
-Prerequisites
+1. Prerequisites
 
 ```
-PostgreSQL installed locally.
-Python 3.x installed.
+Docker Desktop
+Python 3.10+ installed.
 ```
 
-Installation
+2. Installation
+
+In a terminal, run the following ONCE to create your postgres database:
+```
+docker run --name boiler_royale -e POSTGRES_USER=samuelyoon -e POSTGRES_PASSWORD=temppassword -e POSTGRES_DB=postgres -p 5432:5432 -d postgres:latest
+```
+
+Then, in your working project directory, execute the following:
 ```
 git clone https://github.com/samuelyoon/boiler-royale.git
 cd boiler-royale
 ```
 
-Set up environment variables Create a .env file in the root directory:
+3. Configure Environment
 
+Create a .env file in the root directory. Update the values to match your inputs.
 ```
 DB_HOST=localhost
 DB_NAME=boiler_royale_db
-DB_USER=your_username
-DB_PASSWORD=your_password
+DB_USER=samuelyoon
+DB_PASSWORD=temppassword
 DB_PORT=5432
 ```
 
-Initialize the Database, Tables, and Triggers:
+4. Initialize System
+
+Run the initialization script. This uses a dual-connection client to first connect to the system database (postgres) to create your project database, then reconnects to deploy the schema and triggers.
 
 ```
 python3 -m db_manager.set_up_db
 ```
 
-Run database operations with main.py to simulate match inputs (currently via sample_data/userinput.txt):
+5. Run Operations
+
+Execute the main script to simulate match inputs and query data:
 
 ```
 python3 main.py
 ```
 
-
 ## Future Scope
 * API Layer: Develop a lightweight Flask/FastAPI wrapper to expose these SQL functions as RESTful endpoints.
 * Load Testing: Benchmark the trigger performance with 10,000+ concurrent match insertions.
-* Frontend Development: Create the other half of this project by making a website that connects to this database hosted on a non-local machine.
+* Full-Stack Development & Flexible Hosting: Develop a responsive web frontend to provide a user-friendly interface. Concurrently, configure the database container for flexible deployment targets - either migrating to a managed cloud service for scalability or self-hosting on a Raspberry Pi to provide a cost-effective, always-on server for the club.
 
 Contact & Contribution
 * Author: Samuel Yoon
-* Project Link: [GitHub Repository Link]
+* Project Link: https://github.com/samuelyoon17/boiler_royale.git
