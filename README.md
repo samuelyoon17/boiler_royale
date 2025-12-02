@@ -4,10 +4,10 @@ A custom tournament management backend designed to facilitate competitive Clash 
 
 ## Technical Capabilities and Key Features:
 
-* Automated Ranking System & Integrity: The system implements a custom Elo rating algorithm for dynamic matchmaking and uses a PostgreSQL Trigger (AFTER INSERT) to ensure data validity. This automatically recalculates and updates player ratings immediately upon match recording, eliminating race conditions and ensuring the leaderboard is always in sync with match history.
-* Performance & Logic Offloading: Complex logic (such as the Elo calculation) is offloaded to the database layer using PL/pgSQL and CTEs. This avoids the latency and risk associated with the application layer having to pull, process, and then push raw data back to the database.
+* Automated Ranking System & Integrity: The system implements a custom Elo rating algorithm for dynamic matchmaking and uses a PostgreSQL Trigger (AFTER INSERT) to ensure data atomicity. This automatically recalculates and updates player ratings immediately upon match recording, eliminating race conditions and ensuring the leaderboard is always in sync with match history.
+* Performance & Logic Offloading: Complex logic (such as the Elo calculation) is offloaded to the database layer using PL/pgSQL. This avoids the latency and risk associated with the application layer having to pull, process, and then push raw data back to the database.
 * Robust Data Architecture: The system uses Foreign Key constraints to link matches reliably to registered users and maintains the transactional integrity of the database. The entire process is executed within atomic transactions, ensuring that if a match recording fails, no partial data is committed.
-* Reporting & Tracking: The system aggregates granular performance statistics (wins, losses, match history) and supports dynamic leaderboards and tournament-specific filtering to retrieve up-to-date player reports.
+* Reporting & Tracking: The system aggregates performance statistics (wins, losses, match history) and supports dynamic leaderboards and tournament-specific filtering to retrieve up-to-date player reports.
 * Tournament Management: The architecture supports the creation and administration of multi-stage tournaments and uses the Elo system for initial seeding and matchmaking.
 
 ## Tech Stack
@@ -18,6 +18,8 @@ A custom tournament management backend designed to facilitate competitive Clash 
 
 ## Database Schema
 
+**Tables**
+
 * **users:** Stores player_tag (PK), credentials, current elo, and aggregate stats.
 * **tournament:** Manages event metadata (start/end dates).
 * **battles:** Transactional log of every match. Linked to users via player1_tag, player2_tag, and winner_tag.
@@ -25,7 +27,7 @@ A custom tournament management backend designed to facilitate competitive Clash 
 
 ## Engineering Journey & Challenges
 
-This project evolved significantly during development as I optimized for scalability and data correctness.
+This project has evolved during development as I optimized for scalability and data atomicity.
 
 1a. Optimization: From Iterative Updates to CTEs
 * Initial Approach: Originally, the update_elo logic required multiple Python calls to execute separate SQL update statements. This was inefficient and repetitive.
@@ -36,7 +38,7 @@ This project evolved significantly during development as I optimized for scalabi
 * Solution: I implemented PostgreSQL Triggers. Now, the moment a match is inserted, a stored procedure (update_elo_on_match_insert) fires automatically. This guarantees atomicity — a match cannot exist without the resulting rating change occurring.
 
 2. Reporting Accuracy: Handling Null Data
-* Initial Approach: When generating tournament reports, players who had not yet played a match were being excluded from results entirely when using the standard INNER JOIN.
+* Initial Approach: When generating tournament reports, players who had not yet played a match were being excluded from results entirely when using the default INNER JOIN.
 * Solution: I implemented a LEFT JOIN combined with moving the filter condition (tournament_id) into the ON clause. This preserves the user row even if match data is null. I then utilized COALESCE to convert those nulls into readable "0-0" records for the frontend/application layer.
 
 3. Faster Search: Creating Indexes
@@ -60,7 +62,7 @@ To accelerate the development and validate architectural decisions, this project
 * Discovering Features: Learning about features of PostgreSQL and psycopg2 (e.g., CTEs, Triggers, COALESCE, connection.autocommit = True, User-defined Functions)
 * Code Optimization: Generating and refactoring SQL + PL/pgSQL statements for improved readability and conciseness (e.g., Elo calculation in PL/pgSQL).
 * Architectural Validation: Answering hypothetical scalability and concurrency questions.
-* Debugging: Identified architectural flaws that would lead to NULL returns for non-participants (e.g., using INNER JOIN for get_user_tournament_info.sql). AI imposed edge cases and suggested improved SQL syntax, resulting in the implementation of LEFT JOIN and robust conditional aggregation (COALESCE).
+* Debugging: Identified architectural flaws that would lead to NULL returns for non-participants (e.g., using INNER JOIN for get_user_tournament_info.sql). AI imposed edge cases and suggested improved SQL syntax, resulting in the implementation of LEFT JOIN and COALESCE.
 * Test Data Generation: Quickly generated simulated data for userinput.txt to robustly test sequential Elo updates and specific reporting queries.
 * Documentation & Presentation: Assisted in articulating technical decisions as shared in this README.
 
@@ -115,9 +117,10 @@ python3 main.py
 ```
 
 ## Future Scope
-* API Layer: Develop a lightweight Flask/FastAPI wrapper to expose these SQL functions as RESTful endpoints.
-* Load Testing: Benchmark the trigger performance with 10,000+ concurrent match insertions.
-* Full-Stack Development & Flexible Hosting: Develop a responsive web frontend to provide a user-friendly interface. Concurrently, configure the database container for flexible deployment targets - either migrating to a managed cloud service for scalability or self-hosting on a Raspberry Pi to provide a cost-effective, always-on server for the club.
+* API Layer: Develop a lightweight Flask backend to serve as the application middleman, exposing core database functions (e.g., match recording, leaderboard retrieval) as RESTful API endpoints.
+* Load Testing: Benchmark the trigger performance with 1,000+ concurrent match insertions.
+* Full-Stack Development & Flexible Hosting: Develop a responsive web frontend to provide a user-friendly interface. Concurrently, configure the database container for flexible deployment targets - either migrating to a managed cloud service for scalability or self-hosting on a Raspberry Pi to provide a cost-effective, always-on server.
+* Product Adoption & Community Impact: Introduce the fully developed system for use by a live competitive gaming community. This crucial step will provide real-world performance metrics, concurrency data, and user feedback necessary to validate the architectural choices (Triggers, Indexes) and guide future feature development.
 
 Contact & Contribution
 * Author: Samuel Yoon
